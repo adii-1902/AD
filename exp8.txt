@@ -1,0 +1,81 @@
+<!--
+MainActivity.java - 
+import android.media.MediaPlayer;
+import android.os.Bundle;
+import androidx.appcompat.app.AppCompatActivity;
+public class MainActivity extends AppCompatActivity {
+    MediaPlayer mediaPlayer;
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_main);
+        mediaPlayer = MediaPlayer.create(this, R.raw.sample_audio);
+
+        findViewById(R.id.playButton).setOnClickListener(v -> {
+            if (!mediaPlayer.isPlaying()) mediaPlayer.start();
+        });
+        findViewById(R.id.pauseButton).setOnClickListener(v -> {
+            if (mediaPlayer.isPlaying()) mediaPlayer.pause();
+        });
+        findViewById(R.id.stopButton).setOnClickListener(v -> {
+            if (mediaPlayer.isPlaying()) {
+                mediaPlayer.stop();
+                mediaPlayer.release();
+                mediaPlayer = MediaPlayer.create(this, R.raw.sample_audio);
+            }
+        });
+        mediaPlayer.setOnCompletionListener(mp -> {
+            mediaPlayer.release();
+            mediaPlayer = MediaPlayer.create(this, R.raw.sample_audio);
+        });
+    }
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        if (mediaPlayer != null) {
+            mediaPlayer.release();
+            mediaPlayer = null;
+        }
+    }
+}
+activity_main.xml - 
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#F0F0F0"
+    android:fitsSystemWindows="true">
+    <TextView
+        android:id="@+id/titleBar"
+        android:layout_width="match_parent"
+        android:layout_height="56dp"
+        android:background="#6200EE"
+        android:gravity="center"
+        android:text="Media Player"
+        android:textColor="#FFFFFF"
+        android:textSize="20sp"
+        android:textStyle="bold" />
+<LinearLayout
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:gravity="center"
+    android:padding="16dp">
+    <Button
+        android:id="@+id/playButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Play" />
+    <Button
+        android:id="@+id/pauseButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Pause" />
+    <Button
+        android:id="@+id/stopButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Stop" />
+</LinearLayout>
+</RelativeLayout>
+-->

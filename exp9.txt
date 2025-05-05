@@ -1,0 +1,160 @@
+<!--
+MainActivity.java - 
+package com.example.exp9prac;
+import android.content.Context;
+import android.os.Bundle;
+import android.os.Environment;
+import android.view.View;
+import android.widget.EditText;
+import android.widget.RadioButton;
+import android.widget.Toast;
+import androidx.appcompat.app.AppCompatActivity;
+import java.io.*;
+public class MainActivity extends AppCompatActivity {
+    EditText dataInput, fileNameInput;
+    RadioButton internalStorageRadio, externalStorageRadio;
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_main);
+        dataInput = findViewById(R.id.dataInput);
+        fileNameInput = findViewById(R.id.fileNameInput);
+        internalStorageRadio = findViewById(R.id.internalStorageRadio);
+        externalStorageRadio = findViewById(R.id.externalStorageRadio);
+    }
+    public void saveData(View view) {
+        String data = dataInput.getText().toString();
+        String fileName = fileNameInput.getText().toString();
+        if (data.isEmpty() || fileName.isEmpty()) {
+            showToast("Enter both data and filename");
+            return;
+        }
+        try {
+            if (internalStorageRadio.isChecked()) {
+                try (FileOutputStream fos = openFileOutput(fileName, Context.MODE_PRIVATE)) {
+                    fos.write(data.getBytes());
+                    showToast("Saved to Internal Storage");
+                }
+            } else if (externalStorageRadio.isChecked() && isExternalWritable()) {
+                File file = new File(getExternalFilesDir(null), fileName);
+                try (FileOutputStream fos = new FileOutputStream(file)) {
+                    fos.write(data.getBytes());
+                    showToast("Saved to External Storage");
+                }
+            } else {
+                showToast("Select a valid storage option");
+            }
+        } catch (Exception e) {
+            showToast("Error saving: " + e.getMessage());
+        }
+    }
+    public void loadData(View view) {
+        String fileName = fileNameInput.getText().toString();
+        if (fileName.isEmpty()) {
+            showToast("Enter filename");
+            return;
+        }
+        try {
+            StringBuilder sb = new StringBuilder();
+            BufferedReader br;
+            if (internalStorageRadio.isChecked()) {
+                br = new BufferedReader(new InputStreamReader(openFileInput(fileName)));
+            } else if (externalStorageRadio.isChecked() && isExternalReadable()) {
+                File file = new File(getExternalFilesDir(null), fileName);
+                br = new BufferedReader(new InputStreamReader(new FileInputStream(file)));
+            } else {
+                showToast("Select a valid storage option");
+                return;
+            }
+            String line;
+            while ((line = br.readLine()) != null) {
+                sb.append(line).append("\n");
+            }
+            br.close();
+            dataInput.setText(sb.toString().trim());
+            showToast("Data loaded successfully");
+        } catch (Exception e) {
+            showToast("Error loading: " + e.getMessage());
+        }
+    }
+    private boolean isExternalWritable() {
+        return Environment.MEDIA_MOUNTED.equals(Environment.getExternalStorageState());
+    }
+    private boolean isExternalReadable() {
+        String state = Environment.getExternalStorageState();
+        return Environment.MEDIA_MOUNTED.equals(state) || Environment.MEDIA_MOUNTED_READ_ONLY.equals(state);
+    }
+    private void showToast(String msg) {
+        Toast.makeText(this, msg, Toast.LENGTH_SHORT).show();
+    }
+}
+activity_main.java - 
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#F0F0F0"
+    android:fitsSystemWindows="true">
+    <TextView
+        android:id="@+id/titleBar"
+        android:layout_width="match_parent"
+        android:layout_height="56dp"
+        android:background="#6200EE"
+        android:gravity="center"
+        android:text="Data Storage"
+        android:textColor="#FFFFFF"
+        android:textSize="20sp"
+        android:textStyle="bold" />
+<LinearLayout
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:padding="16dp"
+    android:gravity="center">
+    <EditText
+        android:id="@+id/fileNameInput"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Filename" />
+    <EditText
+        android:id="@+id/dataInput"
+        android:layout_width="match_parent"
+        android:layout_height="150dp"
+        android:hint="Enter Data"
+        android:gravity="top" />
+    <RadioGroup
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+        <RadioButton
+            android:id="@+id/internalStorageRadio"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Internal" />
+        <RadioButton
+            android:id="@+id/externalStorageRadio"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="External" />
+    </RadioGroup>
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center">
+        <Button
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Save"
+            android:onClick="saveData" />
+        <Button
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Load"
+            android:onClick="loadData"
+            android:layout_marginStart="8dp" />
+    </LinearLayout>
+</LinearLayout>
+</RelativeLayout>
+
+-->
